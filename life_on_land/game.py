@@ -1,4 +1,6 @@
 import arcade
+from pyglet.math import Vec2
+from pytiled_parser import ObjectLayer
 
 from life_on_land.constants import *
 from life_on_land.player import PlayerSprite
@@ -41,11 +43,20 @@ class GameWindow(arcade.Window):
         self.tilemap: arcade.TileMap | None = None
         self.scene: arcade.Scene | None = None
         self.engine: arcade.physics_engines.PhysicsEnginePlatformer | None = None
-        self.load_level("forest.tmx")
+        self.load_level("test.tmx")
 
     def load_level(self, level_name: str):
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
         self.scene = arcade.Scene.from_tilemap(self.tilemap)
+
+        # Seems like it wasn't intended to use object layers in Tiled
+        object_layer: ObjectLayer = self.tilemap.get_tilemap_layer("Game")  # type: ignore
+        for obj in object_layer.tiled_objects:
+            if obj.name == "Player":
+                player_x, player_y = obj.coordinates
+                total_height = self.tilemap.height * self.tilemap.tile_height
+                self.player_sprite.position = player_x, total_height - player_y
+
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
             walls=self.scene["Platforms"],
@@ -97,5 +108,5 @@ class GameWindow(arcade.Window):
             screen_center_y = 0
 
         # Here's our center, move to it
-        player_centered = screen_center_x, screen_center_y
+        player_centered = Vec2(screen_center_x, screen_center_y)
         self.camera_sprites.move_to(player_centered)
