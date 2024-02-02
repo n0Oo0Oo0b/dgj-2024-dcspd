@@ -1,12 +1,33 @@
 {
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
     "activeFile": "",
     "expandedProjectPaths": [
     ],
     "fileStates": {
+        "levels/forest.tmx": {
+            "scale": 0.4282,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 897.9448855674916,
+                "y": 492.76039234002803
+            }
+        },
+        "tilesets/grass.tsx": {
+            "dynamicWrapping": true
+        }
     },
+    "last.imagePath": "/Users/maxlin/Documents/dgj-2024-dcspd/assets/textures/GRASS",
+    "map.fixedSize": false,
+    "map.lastUsedFormat": "tmx",
     "openFiles": [
     ],
     "project": "tiled.tiled-project",
     "recentFiles": [
-    ]
+        "levels/forest.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.type": 1
 }
