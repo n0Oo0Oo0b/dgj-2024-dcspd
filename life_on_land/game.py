@@ -21,10 +21,11 @@ class GameWindow(arcade.Window):
         # Inputs
         k = arcade.key
         self.control_map: dict[int, InputType] = (
-            dict.fromkeys([k.UP, k.W, k.SPACE], InputType.UP)
+            dict.fromkeys([k.UP, k.W], InputType.UP)
             | dict.fromkeys([k.DOWN, k.S], InputType.DOWN)
             | dict.fromkeys([k.LEFT, k.A], InputType.LEFT)
             | dict.fromkeys([k.RIGHT, k.D], InputType.RIGHT)
+            | dict.fromkeys([k.SPACE], InputType.SPECIAL)
         )
         self.last_pressed: dict[InputType, float] = {}
         self.pressed_inputs: set[InputType] = set()
