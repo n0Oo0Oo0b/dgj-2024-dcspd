@@ -25,6 +25,8 @@ class PlayerSprite(arcade.Sprite):
         self.last_grounded: float = -1
         self.game_window: "GameWindow" = game_window
 
+        self.level_1_unlocked = True
+
     def on_update(self, delta_time: float = 1 / 60):
         # Update attributes
         game = self.game_window
@@ -46,3 +48,13 @@ class PlayerSprite(arcade.Sprite):
         ):
             game.consume_buffer(InputType.UP)
             self.velocity[1] = PLAYER_JUMP_FORCE
+
+        if self.level_1_unlocked:
+            self.level_1_special()
+
+    def level_1_special(self):
+        game = self.game_window
+        if game.is_buffered(InputType.SPECIAL):
+            game.consume_buffer(InputType.SPECIAL)
+            print("Special Activated")
+            self.velocity[1] = 15
