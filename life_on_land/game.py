@@ -3,15 +3,20 @@ import arcade
 from life_on_land.constants import *
 from life_on_land.player import PlayerSprite
 
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
-SCREEN_TITLE = "Life on Land"
-INPUT_BUFFER_DURATION = 0.1
-
 
 class GameWindow(arcade.Window):
+    SCREEN_WIDTH = 1280
+    SCREEN_HEIGHT = 720
+    SCREEN_TITLE = "Life on Land"
+    INPUT_BUFFER_DURATION = 0.1
+
     def __init__(self):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
+        super().__init__(
+            self.SCREEN_WIDTH,
+            self.SCREEN_HEIGHT,
+            self.SCREEN_TITLE,
+            resizable=True,
+        )
 
         # Game related
         self.player_sprite: PlayerSprite = PlayerSprite(self)
@@ -67,7 +72,7 @@ class GameWindow(arcade.Window):
         self.pressed_inputs.discard(type_)
 
     def is_buffered(self, key: InputType):
-        return self.last_pressed.get(key, -1) + INPUT_BUFFER_DURATION > self.global_time
+        return self.last_pressed.get(key, -1) + self.INPUT_BUFFER_DURATION > self.global_time
 
     def consume_buffer(self, key: InputType):
         self.last_pressed[key] = -1
