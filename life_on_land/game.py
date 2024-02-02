@@ -3,8 +3,8 @@ import arcade
 from life_on_land.constants import *
 from life_on_land.player import PlayerSprite
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Life on Land"
 INPUT_BUFFER_DURATION = 0.1
 
@@ -16,6 +16,7 @@ class GameWindow(arcade.Window):
         # Game related
         self.player_sprite: PlayerSprite = PlayerSprite(self)
         self.global_time: float = 0
+        self.camera_sprites = arcade.Camera(self.width, self.height)
 
         # Inputs
         k = arcade.key
@@ -41,11 +42,14 @@ class GameWindow(arcade.Window):
         self.engine.update()
         self.player_sprite.on_update(delta_time)
 
+        self.center_camera_to_player()
+
     def on_draw(self):
         self.clear()
-
-        self.scene.draw()
+        self.camera_sprites.use()
+        self.scene.draw(pixelated=True)
         self.player_sprite.draw()
+
 
     def on_key_press(self, key, modifiers):
         if key in {arcade.key.ESCAPE, arcade.key.Q}:
@@ -67,3 +71,17 @@ class GameWindow(arcade.Window):
 
     def consume_buffer(self, key: InputType):
         self.last_pressed[key] = -1
+
+    def center_camera_to_player(self):
+        screen_center_x = self.player_sprite.center_x - (self.camera_sprites.viewport_width / 2)
+        screen_center_y = self.player_sprite.center_y - (self.camera_sprites.viewport_height / 2)
+
+        # Set some limits on how far we scroll
+        if screen_center_x < 0:
+            screen_center_x = 0
+        if screen_center_y < 0:
+            screen_center_y = 0
+
+        # Here's our center, move to it
+        player_centered = screen_center_x, screen_center_y
+        self.camera_sprites.move_to(player_centered)
