@@ -45,4 +45,4 @@ class FireHoseEffect(LevelEffect):
             vel_diff = self.LAUNCH_VELOCITY - self.player.velocity[1]
             self.player.velocity[1] += vel_diff * self.LAUNCH_ACCEL_FACTOR
         elif game.engine.can_jump():
-            pass
+            self.can_launch = True

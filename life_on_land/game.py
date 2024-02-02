@@ -9,6 +9,7 @@ class GameWindow(arcade.Window):
     SCREEN_HEIGHT = 720
     SCREEN_TITLE = "Life on Land"
     INPUT_BUFFER_DURATION = 0.1
+    LEVEL_DIR = ASSET_PATH / "levels"
 
     def __init__(self):
         super().__init__(
@@ -35,8 +36,16 @@ class GameWindow(arcade.Window):
         self.last_pressed: dict[InputType, float] = {}
         self.pressed_inputs: set[InputType] = set()
 
-        self.tilemap: arcade.TileMap = arcade.load_tilemap(":resources:tiled_maps/map.json", 0.3)
-        self.scene: arcade.Scene = arcade.Scene.from_tilemap(self.tilemap)
+        # self.tilemap: arcade.TileMap = arcade.load_tilemap(":resources:tiled_maps/map.json", 0.3)
+        # self.scene: arcade.Scene = arcade.Scene.from_tilemap(self.tilemap)
+        self.tilemap: arcade.TileMap | None = None
+        self.scene: arcade.Scene | None = None
+        self.engine: arcade.physics_engines.PhysicsEnginePlatformer | None = None
+        self.load_level("forest.tmx")
+
+    def load_level(self, level_name: str):
+        self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
+        self.scene = arcade.Scene.from_tilemap(self.tilemap)
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
             walls=self.scene["Platforms"],
