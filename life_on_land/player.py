@@ -9,13 +9,12 @@ if TYPE_CHECKING:
     from life_on_land.game import GameWindow
 
 
-FRICTION_FACTOR = 0.4
-PLAYER_SPEED = 5
-PLAYER_JUMP_FORCE = 10
-COYOTE_DURATION = 0.1
-
-
 class PlayerSprite(arcade.Sprite):
+    FRICTION_FACTOR = 0.4
+    PLAYER_SPEED = 5
+    PLAYER_JUMP_FORCE = 10
+    COYOTE_DURATION = 0.1
+
     def __init__(self, game_window: "GameWindow"):
         super().__init__(
             scale=2,
@@ -36,17 +35,17 @@ class PlayerSprite(arcade.Sprite):
         # X movement
         right_pressed = InputType.RIGHT in game.pressed_inputs
         left_pressed = InputType.LEFT in game.pressed_inputs
-        target_vel = (right_pressed - left_pressed) * PLAYER_SPEED
+        target_vel = (right_pressed - left_pressed) * self.PLAYER_SPEED
 
         vel_diff = target_vel - self.velocity[0]
-        self.velocity[0] += vel_diff * FRICTION_FACTOR
+        self.velocity[0] += vel_diff * self.FRICTION_FACTOR
 
         # Y movement (jump)
         if (
             game.is_buffered(InputType.UP)
-            and self.last_grounded + COYOTE_DURATION >= game.global_time
+            and self.last_grounded + self.COYOTE_DURATION >= game.global_time
         ):
             game.consume_buffer(InputType.UP)
-            self.velocity[1] = PLAYER_JUMP_FORCE
+            self.velocity[1] = self.PLAYER_JUMP_FORCE
 
         self.special.on_update()
