@@ -16,6 +16,11 @@ class LevelEffect(ABC):
         raise NotImplementedError
 
 
+class NoEffect(LevelEffect):
+    def on_update(self):
+        pass
+
+
 class FireHoseEffect(LevelEffect):
     LAUNCH_VELOCITY = 7.5
     LAUNCH_ACCEL_FACTOR = 0.2
