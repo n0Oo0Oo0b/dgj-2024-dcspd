@@ -1,4 +1,8 @@
 from enum import IntEnum
+from pathlib import Path
+
+
+ASSET_PATH = Path("assets/")
 
 
 class InputType(IntEnum):

@@ -28,16 +28,28 @@ class GameWindow(arcade.Window):
         self.last_pressed: dict[InputType, float] = {}
         self.pressed_inputs: set[InputType] = set()
 
+        self.tilemap: arcade.TileMap = arcade.load_tilemap(":resources:tiled_maps/map.json", 0.3)
+        self.scene: arcade.Scene = arcade.Scene.from_tilemap(self.tilemap)
+        self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
+            self.player_sprite,
+            walls=self.scene["Platforms"],
+        )
+
     def on_update(self, delta_time: float):
         self.global_time += delta_time
 
+        self.engine.update()
         self.player_sprite.on_update(delta_time)
 
     def on_draw(self):
-        pass
+        self.clear()
+
+        self.scene.draw()
+        self.player_sprite.draw()
 
     def on_key_press(self, key, modifiers):
         if key in {arcade.key.ESCAPE, arcade.key.Q}:
+            self.close()
             return
 
         if (type_ := self.control_map.get(key)) is None:
