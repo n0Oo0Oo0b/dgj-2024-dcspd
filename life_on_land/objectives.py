@@ -66,4 +66,3 @@ class ObjectiveSprite(arcade.Sprite):
         super().draw(**kwargs)
         if self.e:
             self.e.draw()
-
