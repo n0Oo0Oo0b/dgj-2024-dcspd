@@ -3,6 +3,8 @@ from pyglet.math import Vec2
 from pytiled_parser import ObjectLayer
 
 from life_on_land.constants import *
+from life_on_land.objectives import ObjectiveSprite
+from life_on_land.pickups import PickupSprite
 from life_on_land.player import PlayerSprite
 
 
@@ -27,7 +29,15 @@ class GameWindow(arcade.Window):
         self.current_level: Level = Level.GRASS
         self.player_sprite: PlayerSprite = PlayerSprite(self)
         self.ost = None
-        self.background = arcade.load_texture(ASSET_PATH / "textures" / "GRASS" / "Game Jam Background - Thorgatus.gif")
+        self.background = ASSET_PATH / "textures" / "GRASS" / "Game Jam Background - Thorgatus.gif"
+        self.debug_enabled: bool = False
+        self.update_engine: bool = True
+        self.background_sprites = [arcade.Sprite(self.background, 4) for i in range(56)]
+        count = 0
+        for j in range(4)[::-1]:
+            for i in range(14):
+                self.background_sprites[count].position = [(i - j/2) * 2160, j * (732 - 240) + 350]
+                count += 1
 
         # Inputs
         k = arcade.key
@@ -37,17 +47,20 @@ class GameWindow(arcade.Window):
             | dict.fromkeys([k.LEFT, k.A], InputType.LEFT)
             | dict.fromkeys([k.RIGHT, k.D], InputType.RIGHT)
             | dict.fromkeys([k.SPACE], InputType.SPECIAL)
+            #| dict.fromkeys([k.E, k.C], InputType.TALK)
         )
         self.last_pressed: dict[InputType, float] = {}
         self.pressed_inputs: set[InputType] = set()
 
-        # self.tilemap: arcade.TileMap = arcade.load_tilemap(":resources:tiled_maps/map.json", 0.3)
-        # self.scene: arcade.Scene = arcade.Scene.from_tilemap(self.tilemap)
+        # Level
         self.tilemap: arcade.TileMap | None = None
         self.scene: arcade.Scene | None = None
         self.engine: arcade.physics_engines.PhysicsEnginePlatformer | None = None
         self.objective_sprites: arcade.SpriteList = arcade.SpriteList()
-        self.load_level("desert.tmx")
+        self.danger_sprites: arcade.SpriteList = arcade.SpriteList()
+        self.pickup_sprite: arcade.Sprite | None = None
+        self.camera_end = 0
+        self.load_level("forest-final.tmx")
 
     def load_level(self, level_name: str):
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
@@ -55,6 +68,9 @@ class GameWindow(arcade.Window):
         self.ost = arcade.load_sound(ASSET_PATH / 'sounds' / 'Forest.wav')
         arcade.play_sound(self.ost, 0.8, 0.0, True, 1)
         self.objective_sprites.clear()
+        self.danger_sprites = self.scene["Danger"]
+        for sprite in self.danger_sprites:
+            sprite._points = [(0, 0), (32, 0), (32, 1), (0, 1)]
 
         # Seems like it wasn't intended to use object layers in Tiled
         object_layer: ObjectLayer = self.tilemap.get_tilemap_layer("Game")  # type: ignore
@@ -65,40 +81,52 @@ class GameWindow(arcade.Window):
             if obj.name == "Player":
                 self.player_sprite.position = obj_x, obj_y
             elif obj.name == "Objective":
-                sprite = arcade.Sprite(
-                    ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png",
-                    center_x=obj_x,
-                    center_y=obj_y,
-                )
-                self.objective_sprites.append(sprite)
+                self.objective_sprites.append(ObjectiveSprite(self, (obj_x, obj_y)))
+            elif obj.name == "Unlock":
+                self.pickup_sprite = PickupSprite(self, (obj_x, obj_y))
+            elif obj.name == "End":
+                self.camera_end = obj_x - self.SCREEN_WIDTH
+
 
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
-            walls=self.scene["Platforms"],
+            walls=[self.scene["Platforms"], self.objective_sprites],
         )
 
     def on_update(self, delta_time: float):
         self.global_time += delta_time
 
-        self.engine.update()
+        if self.update_engine:
+            self.engine.update()
         self.player_sprite.on_update(delta_time)
+
+        if self.player_sprite.collides_with_sprite(self.pickup_sprite):
+            self.pickup_sprite.center_y -= 10000
+            self.player_sprite.apply_special()
 
         self.center_camera_to_player()
 
     def on_draw(self):
         self.clear()
-        arcade.draw_lrwh_rectangle_textured(0, 0,
-                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
-                                            self.background)
+        for sprite in self.background_sprites: sprite.draw()
         self.camera_sprites.use()
         self.scene.draw(pixelated=True)
         self.objective_sprites.draw()
+        self.pickup_sprite.draw()
         self.player_sprite.draw()
+
+        if self.debug_enabled:
+            self.player_sprite.draw_hit_box((255, 0, 0), 2)
+            self.objective_sprites.draw_hit_boxes((0, 0, 255), 2)
 
     def on_key_press(self, key, modifiers):
         if key in {arcade.key.ESCAPE, arcade.key.Q}:
             self.close()
             return
+        elif key == arcade.key.GRAVE:
+            self.debug_enabled = not self.debug_enabled
+        elif key == arcade.key.P and self.debug_enabled:
+            self.update_engine = not self.update_engine
 
         if (type_ := self.control_map.get(key)) is None:
             return
@@ -110,6 +138,12 @@ class GameWindow(arcade.Window):
             return
         self.pressed_inputs.discard(type_)
 
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        if self.debug_enabled and button == 1:
+            target = self.camera_sprites.position + Vec2(x, y)
+            self.player_sprite.position = target
+            self.player_sprite.velocity = [0, 0]
+
     def is_buffered(self, key: InputType):
         return self.last_pressed.get(key, -1) + self.INPUT_BUFFER_DURATION > self.global_time
 
@@ -117,14 +151,13 @@ class GameWindow(arcade.Window):
         self.last_pressed[key] = -1
 
     def center_camera_to_player(self):
+        print(self.camera_end)
         screen_center_x = self.player_sprite.center_x - (self.camera_sprites.viewport_width / 2)
         screen_center_y = self.player_sprite.center_y - (self.camera_sprites.viewport_height / 2)
 
         # Set some limits on how far we scroll
-        if screen_center_x < 0:
-            screen_center_x = 0
-        if screen_center_y < 0:
-            screen_center_y = 0
+        screen_center_x = min(max(screen_center_x, 0), self.camera_end)
+        screen_center_y = max(screen_center_y, 0)
 
         # Here's our center, move to it
         player_centered = Vec2(screen_center_x, screen_center_y)

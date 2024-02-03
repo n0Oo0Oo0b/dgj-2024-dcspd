@@ -1,9 +1,10 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import arcade
+import math
 
 from life_on_land.constants import *
-from life_on_land.level_effects import FireHoseEffect
+from life_on_land.level_effects import NoEffect, EFFECT_MAPPING
 
 if TYPE_CHECKING:
     from life_on_land.game import GameWindow
@@ -19,6 +20,7 @@ class PlayerSprite(arcade.Sprite):
         2: "DesertBiome",
         3: "IceBiome"
     }
+    TEXTURE_PATH = ASSET_PATH / "player" / "Hero"
 
     def __init__(self, game_window: "GameWindow"):
         super().__init__(
@@ -30,13 +32,18 @@ class PlayerSprite(arcade.Sprite):
         self.last_grounded: float = -1
         self.grounded_position = [0, 0]
         self.game_window: "GameWindow" = game_window
-        self.special = FireHoseEffect(self)
-        self.texture_map = {
-            'idle': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Front" / "Front.png"),
-            'walk': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Run" / "SideRun.png"),
-            'side': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Side" / "Side.png")
-        }
+        self.special = NoEffect(self)
+        self.texture_map: dict[Literal["idle", "walk", "side"], arcade.Texture] = {}
+        self.load_textures(self.game_window.current_level)
         self.texture = self.texture_map['idle']
+
+    def load_textures(self, level: Level):
+        textures = self.TEXTURE_PATH / self.MAP[level]
+        self.texture_map = {
+            "idle": arcade.load_texture(textures / "Front" / "Front.png"),
+            "walk": arcade.load_texture(textures / "Run" / "SideRun.png"),
+            "side": arcade.load_texture(textures / "Side" / "Side.png"),
+        }
 
     def on_update(self, delta_time: float = 1 / 60):
         # Update attributes
@@ -71,8 +78,12 @@ class PlayerSprite(arcade.Sprite):
             game.consume_buffer(InputType.UP)
             self.velocity[1] = self.PLAYER_JUMP_FORCE
 
-        if self.position[1] < - 256:
-            self.position = self.grounded_position
+        if self.position[1] < - 256 or self.collides_with_list(game.danger_sprites):
+            difference = -1
+            if self.position[0] < self.grounded_position[0]:
+                difference = +1
+            print(self.grounded_position[0] / 32)
+            self.position = [round(self.grounded_position[0] / 32, 0) * 32 + difference * 16, self.grounded_position[1]]
             self.velocity = [0, 0]
 
         self.special.on_update()
@@ -80,3 +91,7 @@ class PlayerSprite(arcade.Sprite):
     def draw(self, **kwargs):
         super().draw(**kwargs)
         self.special.draw()
+
+    def apply_special(self):
+        effect_cls = EFFECT_MAPPING[self.game_window.current_level]
+        self.special = effect_cls(self)
