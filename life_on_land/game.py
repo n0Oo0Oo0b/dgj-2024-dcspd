@@ -58,6 +58,10 @@ class GameWindow(arcade.Window):
         self.pickup_sprite: arcade.Sprite | None = None
         self.camera_end = 0
         self.load_level("forest-final.tmx")
+        self.text = [[["OH NO THE TREES ARE ON FIRE!", 2700, 480],
+                      ["We must retrieve the fire hose from the fire house!", 2700, 430],
+                      ["Pick up the fire hose (hold space to boost)", 1400, 850],
+                      ["Press E to put out fires", 3300, 230]]]
 
     def load_level(self, level_name: str):
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
@@ -115,6 +119,16 @@ class GameWindow(arcade.Window):
         self.scene.draw(pixelated=True)
         self.pickup_sprite.draw()
         self.player_sprite.draw()
+        if self.current_level == 1:
+            for text in self.text[self.current_level-1]:
+                arcade.draw_text(
+                    text[0],
+                    text[1],
+                    text[2],
+                    arcade.color.BLACK,
+                    30,
+                    font_name="Kenney High Square"
+                )
 
         if self.debug_enabled:
             self.player_sprite.draw_hit_box((255, 0, 0), 2)
