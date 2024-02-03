@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 class ObjectiveSprite(arcade.Sprite):
     TEXTURE_MAP: dict[Level, Path] = {
         Level.GRASS: ASSET_PATH / "textures" / "GRASS" / "objective",
+        Level.DESERT: ASSET_PATH / "textures" / "DESERT" / "objective",
     }
 
     def __init__(self, game_window: "GameWindow", position):
