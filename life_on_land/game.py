@@ -43,7 +43,7 @@ class GameWindow(arcade.Window):
             | dict.fromkeys([k.LEFT, k.A], InputType.LEFT)
             | dict.fromkeys([k.RIGHT, k.D], InputType.RIGHT)
             | dict.fromkeys([k.SPACE], InputType.SPECIAL)
-            #| dict.fromkeys([k.E, k.C], InputType.TALK)
+            | dict.fromkeys([k.E, k.C], InputType.TALK)
         )
         self.last_pressed: dict[InputType, float] = {}
         self.pressed_inputs: set[InputType] = set()
