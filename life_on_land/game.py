@@ -88,7 +88,6 @@ class GameWindow(arcade.Window):
             elif obj.name == "End":
                 self.camera_end = obj_x - self.SCREEN_WIDTH
 
-
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
             walls=[self.scene["Platforms"], self.objective_sprites],
@@ -153,7 +152,6 @@ class GameWindow(arcade.Window):
         self.last_pressed[key] = -1
 
     def center_camera_to_player(self):
-        print(self.camera_end)
         screen_center_x = self.player_sprite.center_x - (self.camera_sprites.viewport_width / 2)
         screen_center_y = self.player_sprite.center_y - (self.camera_sprites.viewport_height / 2)
 
