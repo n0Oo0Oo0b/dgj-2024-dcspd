@@ -29,9 +29,15 @@ class GameWindow(arcade.Window):
         self.current_level: Level = Level.GRASS
         self.player_sprite: PlayerSprite = PlayerSprite(self)
         self.ost = None
-        self.background = arcade.load_texture(ASSET_PATH / "textures" / "GRASS" / "Game Jam Background - Thorgatus.gif")
+        self.background = ASSET_PATH / "textures" / "GRASS" / "Game Jam Background - Thorgatus.gif"
         self.debug_enabled: bool = False
         self.update_engine: bool = True
+        self.background_sprites = [arcade.Sprite(self.background, 4) for i in range(56)]
+        count = 0
+        for j in range(4)[::-1]:
+            for i in range(14):
+                self.background_sprites[count].position = [(i - j/2) * 2160, j * (732 - 240) + 350]
+                count += 1
 
         # Inputs
         k = arcade.key
@@ -41,7 +47,7 @@ class GameWindow(arcade.Window):
             | dict.fromkeys([k.LEFT, k.A], InputType.LEFT)
             | dict.fromkeys([k.RIGHT, k.D], InputType.RIGHT)
             | dict.fromkeys([k.SPACE], InputType.SPECIAL)
-            | dict.fromkeys([k.E, k.C], InputType.TALK)
+            #| dict.fromkeys([k.E, k.C], InputType.TALK)
         )
         self.last_pressed: dict[InputType, float] = {}
         self.pressed_inputs: set[InputType] = set()
@@ -53,7 +59,9 @@ class GameWindow(arcade.Window):
         self.objective_sprites: arcade.SpriteList = arcade.SpriteList()
         self.danger_sprites: arcade.SpriteList = arcade.SpriteList()
         self.pickup_sprite: arcade.Sprite | None = None
+        self.camera_end = 0
         self.load_level("forest-final.tmx")
+
 
     def load_level(self, level_name: str):
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
@@ -77,6 +85,9 @@ class GameWindow(arcade.Window):
                 self.objective_sprites.append(ObjectiveSprite(self, (obj_x, obj_y)))
             elif obj.name == "Unlock":
                 self.pickup_sprite = PickupSprite(self, (obj_x, obj_y))
+            elif obj.name == "End":
+                self.camera_end = obj_x - self.SCREEN_WIDTH
+
 
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
@@ -98,16 +109,7 @@ class GameWindow(arcade.Window):
 
     def on_draw(self):
         self.clear()
-        for j in range(4)[::-1]:
-            for i in range(14):
-                arcade.draw_lrwh_rectangle_textured(
-                    (i - j/2) * self.SCREEN_WIDTH,
-                    j * (self.SCREEN_HEIGHT - 240),
-                    self.SCREEN_WIDTH,
-                    self.SCREEN_HEIGHT,
-                    self.background,
-                )
-
+        for sprite in self.background_sprites: sprite.draw()
         self.camera_sprites.use()
         self.scene.draw(pixelated=True)
         self.objective_sprites.draw()
@@ -150,11 +152,12 @@ class GameWindow(arcade.Window):
         self.last_pressed[key] = -1
 
     def center_camera_to_player(self):
+        print(self.camera_end)
         screen_center_x = self.player_sprite.center_x - (self.camera_sprites.viewport_width / 2)
         screen_center_y = self.player_sprite.center_y - (self.camera_sprites.viewport_height / 2)
 
         # Set some limits on how far we scroll
-        screen_center_x = min(max(screen_center_x, 0), 13000)
+        screen_center_x = min(max(screen_center_x, 0), self.camera_end)
         screen_center_y = max(screen_center_y, 0)
 
         # Here's our center, move to it
