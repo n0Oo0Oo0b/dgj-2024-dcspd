@@ -1,10 +1,9 @@
 from typing import TYPE_CHECKING
 
 import arcade
-from pyglet.math import Vec2
 
 from life_on_land.constants import *
-from life_on_land.level_effects import *
+from life_on_land.level_effects import FireHoseEffect
 
 if TYPE_CHECKING:
     from life_on_land.game import GameWindow
