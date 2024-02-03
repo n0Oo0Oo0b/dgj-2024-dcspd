@@ -76,6 +76,7 @@ class GameWindow(arcade.Window):
         self.scene.draw(pixelated=True)
         self.player_sprite.draw()
 
+
     def on_key_press(self, key, modifiers):
         if key in {arcade.key.ESCAPE, arcade.key.Q}:
             self.close()
