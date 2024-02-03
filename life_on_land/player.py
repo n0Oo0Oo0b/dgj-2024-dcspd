@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Literal
 
 import arcade
+import math
 
 from life_on_land.constants import *
 from life_on_land.level_effects import NoEffect, EFFECT_MAPPING
@@ -29,6 +30,7 @@ class PlayerSprite(arcade.Sprite):
         self.animation_tick_count = 0
         self.position = [100, 75]
         self.last_grounded: float = -1
+        self.grounded_position = [0, 0]
         self.game_window: "GameWindow" = game_window
         self.special = NoEffect(self)
         self.texture_map: dict[Literal["idle", "walk", "side"], arcade.Texture] = {}
@@ -44,10 +46,13 @@ class PlayerSprite(arcade.Sprite):
         }
 
     def on_update(self, delta_time: float = 1 / 60):
+        print(self.position)
+
         # Update attributes
         game = self.game_window
         if game.engine.can_jump():
             self.last_grounded = game.global_time
+            self.grounded_position = self.position
 
         # X movement
         right_pressed = InputType.RIGHT in game.pressed_inputs
@@ -74,6 +79,14 @@ class PlayerSprite(arcade.Sprite):
         ):
             game.consume_buffer(InputType.UP)
             self.velocity[1] = self.PLAYER_JUMP_FORCE
+
+        if self.position[1] < - 256 or self.collides_with_list(game.danger_sprites):
+            difference = -1
+            if self.position[0] < self.grounded_position[0]:
+                difference = +1
+            print(self.grounded_position[0] / 32)
+            self.position = [round(self.grounded_position[0] / 32, 0) * 32 + difference * 16, self.grounded_position[1]]
+            self.velocity = [0, 0]
 
         self.special.on_update()
 
