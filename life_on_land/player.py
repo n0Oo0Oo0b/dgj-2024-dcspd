@@ -15,23 +15,29 @@ class PlayerSprite(arcade.Sprite):
     PLAYER_SPEED = 5
     PLAYER_JUMP_FORCE = 10
     COYOTE_DURATION = 0.1
+    MAP = {
+        1: "GrassBiome",
+        2: "DesertBiome",
+        3: "IceBiome"
+    }
 
     def __init__(self, game_window: "GameWindow"):
         super().__init__(
             scale=2,
         )
 
-        self.texture_map = {
-            'idle': arcade.load_texture(ASSET_PATH / "player" / "Hero" / "GrassBiome" / "Front" / "Front-GRASS.png"),
-            'walk': arcade.load_texture(ASSET_PATH / "player" / "Hero" / "GrassBiome" / "Run" / "SideRun.png"),
-            'side': arcade.load_texture(ASSET_PATH / "player" / "Hero" / "GrassBiome" / "Side" / "Side-GRASS.png")
-        }
-        self.texture = self.texture_map['idle']
         self.animation_tick_count = 0
         self.position = [100, 75]
         self.last_grounded: float = -1
         self.game_window: "GameWindow" = game_window
         self.special = FireHoseEffect(self)
+        self.texture_map = {
+            'idle': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Front" / "Front.png"),
+            'walk': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Run" / "SideRun.png"),
+            'side': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Side" / "Side.png")
+        }
+        self.texture = self.texture_map['idle']
+
 
         self.level_1_unlocked = True
 
