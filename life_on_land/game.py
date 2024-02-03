@@ -25,6 +25,7 @@ class GameWindow(arcade.Window):
         self.player_sprite: PlayerSprite = PlayerSprite(self)
         self.global_time: float = 0
         self.camera_sprites = arcade.Camera(self.width, self.height)
+        self.current_level: Level = Level.GRASS
 
         # Inputs
         k = arcade.key
@@ -75,6 +76,7 @@ class GameWindow(arcade.Window):
         self.camera_sprites.use()
         self.scene.draw(pixelated=True)
         self.player_sprite.draw()
+
 
     def on_key_press(self, key, modifiers):
         if key in {arcade.key.ESCAPE, arcade.key.Q}:

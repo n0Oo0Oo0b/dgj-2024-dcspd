@@ -11,3 +11,10 @@ class InputType(IntEnum):
     LEFT = 2
     RIGHT = 3
     SPECIAL = 4
+
+
+class Level(IntEnum):
+    MAIN = 0
+    GRASS = 1
+    DESERT = 2
+    ICE = 3
