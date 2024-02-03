@@ -84,7 +84,6 @@ class GameWindow(arcade.Window):
             elif obj.name == "End":
                 self.camera_end = obj_x - self.SCREEN_WIDTH
 
-
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
             walls=[self.scene["Platforms"], self.objective_sprites],
@@ -96,6 +95,7 @@ class GameWindow(arcade.Window):
         if self.update_engine:
             self.engine.update()
         self.player_sprite.on_update(delta_time)
+        self.objective_sprites.update()
 
         if self.player_sprite.collides_with_sprite(self.pickup_sprite):
             self.pickup_sprite.center_y -= 10000
