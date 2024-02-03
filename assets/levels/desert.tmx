@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="200" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="9">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="200" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="10">
  <tileset firstgid="1" source="../tilesets/grass.tsx"/>
  <layer id="1" name="Platforms" width="200" height="50">
   <data encoding="csv">
@@ -164,7 +164,7 @@
 </data>
  </layer>
  <objectgroup id="3" name="Game">
-  <object id="2" name="start" x="82.6446" y="1491.2">
+  <object id="2" name="START" x="82.6446" y="1491.2">
    <properties>
     <property name="START" value=""/>
    </properties>
@@ -183,6 +183,9 @@
    <point/>
   </object>
   <object id="8" name="objective" x="5741.68" y="1498.64">
+   <point/>
+  </object>
+  <object id="9" name="END" x="6262.73" y="1496.95">
    <point/>
   </object>
  </objectgroup>
