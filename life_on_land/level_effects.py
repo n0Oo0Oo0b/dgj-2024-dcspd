@@ -92,3 +92,8 @@ class FireHoseEffect(LevelEffect):
     def draw(self):
         self.e.update()
         self.e.draw()
+
+
+EFFECT_MAPPING: dict[Level, type[LevelEffect]] = {
+    Level.GRASS: FireHoseEffect,
+}
