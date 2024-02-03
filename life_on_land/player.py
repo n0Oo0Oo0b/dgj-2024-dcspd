@@ -1,9 +1,9 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import arcade
 
 from life_on_land.constants import *
-from life_on_land.level_effects import FireHoseEffect
+from life_on_land.level_effects import NoEffect, EFFECT_MAPPING
 
 if TYPE_CHECKING:
     from life_on_land.game import GameWindow
@@ -19,6 +19,7 @@ class PlayerSprite(arcade.Sprite):
         2: "DesertBiome",
         3: "IceBiome"
     }
+    TEXTURE_PATH = ASSET_PATH / "player" / "Hero"
 
     def __init__(self, game_window: "GameWindow"):
         super().__init__(
@@ -29,13 +30,18 @@ class PlayerSprite(arcade.Sprite):
         self.position = [100, 75]
         self.last_grounded: float = -1
         self.game_window: "GameWindow" = game_window
-        self.special = FireHoseEffect(self)
-        self.texture_map = {
-            'idle': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Front" / "Front.png"),
-            'walk': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Run" / "SideRun.png"),
-            'side': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Side" / "Side.png")
-        }
+        self.special = NoEffect(self)
+        self.texture_map: dict[Literal["idle", "walk", "side"], arcade.Texture] = {}
+        self.load_textures(self.game_window.current_level)
         self.texture = self.texture_map['idle']
+
+    def load_textures(self, level: Level):
+        textures = self.TEXTURE_PATH / self.MAP[level]
+        self.texture_map = {
+            "idle": arcade.load_texture(textures / "Front" / "Front.png"),
+            "walk": arcade.load_texture(textures / "Run" / "SideRun.png"),
+            "side": arcade.load_texture(textures / "Side" / "Side.png"),
+        }
 
     def on_update(self, delta_time: float = 1 / 60):
         # Update attributes
