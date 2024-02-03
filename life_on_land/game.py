@@ -3,6 +3,7 @@ from pyglet.math import Vec2
 from pytiled_parser import ObjectLayer
 
 from life_on_land.constants import *
+from life_on_land.pickups import PickupSprite
 from life_on_land.player import PlayerSprite
 
 
@@ -39,12 +40,12 @@ class GameWindow(arcade.Window):
         self.last_pressed: dict[InputType, float] = {}
         self.pressed_inputs: set[InputType] = set()
 
-        # self.tilemap: arcade.TileMap = arcade.load_tilemap(":resources:tiled_maps/map.json", 0.3)
-        # self.scene: arcade.Scene = arcade.Scene.from_tilemap(self.tilemap)
+        # Level
         self.tilemap: arcade.TileMap | None = None
         self.scene: arcade.Scene | None = None
         self.engine: arcade.physics_engines.PhysicsEnginePlatformer | None = None
         self.objective_sprites: arcade.SpriteList = arcade.SpriteList()
+        self.pickup_sprite: arcade.Sprite | None = None
         self.load_level("forest-final.tmx")
 
     def load_level(self, level_name: str):
@@ -67,6 +68,8 @@ class GameWindow(arcade.Window):
                     center_y=obj_y,
                 )
                 self.objective_sprites.append(sprite)
+            elif obj.name == "Unlock":
+                self.pickup_sprite = PickupSprite(self, (obj_x, obj_y))
 
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
@@ -79,6 +82,10 @@ class GameWindow(arcade.Window):
         self.engine.update()
         self.player_sprite.on_update(delta_time)
 
+        if self.player_sprite.collides_with_sprite(self.pickup_sprite):
+            self.pickup_sprite.center_y -= 10000
+            self.player_sprite.apply_special()
+
         self.center_camera_to_player()
 
     def on_draw(self):
@@ -86,6 +93,7 @@ class GameWindow(arcade.Window):
         self.camera_sprites.use()
         self.scene.draw(pixelated=True)
         self.objective_sprites.draw()
+        self.pickup_sprite.draw()
         self.player_sprite.draw()
 
     def on_key_press(self, key, modifiers):
