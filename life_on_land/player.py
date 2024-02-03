@@ -28,6 +28,7 @@ class PlayerSprite(arcade.Sprite):
         self.animation_tick_count = 0
         self.position = [100, 75]
         self.last_grounded: float = -1
+        self.grounded_position = [0, 0]
         self.game_window: "GameWindow" = game_window
         self.special = FireHoseEffect(self)
         self.texture_map = {
@@ -42,6 +43,7 @@ class PlayerSprite(arcade.Sprite):
         game = self.game_window
         if game.engine.can_jump():
             self.last_grounded = game.global_time
+            self.grounded_position = self.position
 
         # X movement
         right_pressed = InputType.RIGHT in game.pressed_inputs
@@ -68,6 +70,10 @@ class PlayerSprite(arcade.Sprite):
         ):
             game.consume_buffer(InputType.UP)
             self.velocity[1] = self.PLAYER_JUMP_FORCE
+
+        if self.position[1] < - 256:
+            self.position = self.grounded_position
+            self.velocity = [0, 0]
 
         self.special.on_update()
 

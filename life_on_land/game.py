@@ -27,6 +27,7 @@ class GameWindow(arcade.Window):
         self.current_level: Level = Level.GRASS
         self.player_sprite: PlayerSprite = PlayerSprite(self)
         self.ost = None
+        self.background = arcade.load_texture(ASSET_PATH / "textures" / "GRASS" / "Game Jam Background - Thorgatus.gif")
 
         # Inputs
         k = arcade.key
@@ -86,6 +87,9 @@ class GameWindow(arcade.Window):
 
     def on_draw(self):
         self.clear()
+        arcade.draw_lrwh_rectangle_textured(0, 0,
+                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
+                                            self.background)
         self.camera_sprites.use()
         self.scene.draw(pixelated=True)
         self.objective_sprites.draw()
