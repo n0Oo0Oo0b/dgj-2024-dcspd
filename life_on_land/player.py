@@ -80,3 +80,7 @@ class PlayerSprite(arcade.Sprite):
     def draw(self, **kwargs):
         super().draw(**kwargs)
         self.special.draw()
+
+    def apply_special(self):
+        effect_cls = EFFECT_MAPPING[self.game_window.current_level]
+        self.special = effect_cls(self)
