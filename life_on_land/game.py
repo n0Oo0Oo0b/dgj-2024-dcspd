@@ -24,6 +24,7 @@ class GameWindow(arcade.Window):
         )
 
         # Game related
+        self.media_player = None
         self.global_time: float = 0
         self.current_level: Level = Level.GRASS
         self.ost = None
@@ -55,23 +56,41 @@ class GameWindow(arcade.Window):
         self.engine: arcade.physics_engines.PhysicsEnginePlatformer | None = None
         self.objective_sprites: arcade.SpriteList = arcade.SpriteList()
         self.danger_sprites: arcade.SpriteList = arcade.SpriteList()
+        self.crumbling_sprites: arcade.SpriteList = arcade.SpriteList()
         self.pickup_sprite: arcade.Sprite | None = None
         self.camera_end = 0
         self.load_level("forest-final.tmx")
         self.text = [[["OH NO THE TREES ARE ON FIRE!", 2700, 480],
-                      ["We must retrieve the fire hose from the fire house!", 2700, 430],
+                      ["We've received a distress call from the forest", 300, 400],
+                      ["(SEE README.MD for controls)", 300, 350],
+                      ["We must find the find hose first to put out the fire!", 2700, 430],
                       ["Pick up the fire hose (hold space to boost)", 1400, 850],
-                      ["Press E to put out fires", 3300, 230]]]
+                      ["Press E next to tree to use", 3300, 230],
+                      ["I'VE TRAVELLED at least 3 miles ", 14000, 32*14],
+                      ["to your location PLEASE HELP US ", 14000, 32*12],
+                      ["AT THE DESERT!!!", 14000, 32 * 10]]]
+        if self.current_level == 1:
+            self.ostrich = arcade.Sprite(ASSET_PATH / 'textures' / 'MISC' / 'Animals' / 'ostrich.png', 4)
+            self.ostrich.position = [14200, 32 * 7]
 
     def load_level(self, level_name: str):
+        try:
+            self.media_player.pause()
+        except AttributeError:
+            pass
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
         self.scene = arcade.Scene.from_tilemap(self.tilemap)
-        self.ost = arcade.load_sound(ASSET_PATH / 'sounds' / 'Forest.wav')
-        arcade.play_sound(self.ost, 0.8, 0.0, True, 1)
+        if self.current_level == 1:
+            self.ost = arcade.load_sound(ASSET_PATH / 'sounds' / 'Forest.wav')
+        else:
+            self.ost = arcade.load_sound(ASSET_PATH / 'sounds' / 'Desert.wav')
+        self.media_player = self.ost.play()
         self.objective_sprites.clear()
         self.danger_sprites = self.scene["Danger"]
+        if self.current_level == 2:
+            self.crumbling_sprites = self.scene["Crumbling"]
         for sprite in self.danger_sprites:
-            sprite._points = [(0, 0), (32, 0), (32, 1), (0, 1)]
+            sprite._points = [(10, 0), (20, 0), (20, 1), (10, 1)]
 
         # Seems like it wasn't intended to use object layers in Tiled
         object_layer: ObjectLayer = self.tilemap.get_tilemap_layer("Game")  # type: ignore
@@ -87,10 +106,9 @@ class GameWindow(arcade.Window):
                 self.pickup_sprite = PickupSprite(self, (obj_x, obj_y))
             elif obj.name == "End":
                 self.camera_end = obj_x - self.SCREEN_WIDTH
-
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
-            walls=[self.scene["Platforms"], self.objective_sprites],
+            walls=[self.scene["Platforms"], self.objective_sprites, self.crumbling_sprites],
         )
 
     def on_update(self, delta_time: float):
@@ -101,9 +119,10 @@ class GameWindow(arcade.Window):
         self.player_sprite.on_update(delta_time)
         self.objective_sprites.update()
 
-        if self.player_sprite.collides_with_sprite(self.pickup_sprite):
-            self.pickup_sprite.center_y -= 10000
-            self.player_sprite.apply_special()
+        if self.current_level == 1:
+            if self.player_sprite.collides_with_sprite(self.pickup_sprite):
+                self.pickup_sprite.center_y -= 10000
+                self.player_sprite.apply_special()
 
         self.center_camera_to_player()
 
@@ -117,8 +136,7 @@ class GameWindow(arcade.Window):
         for i in self.objective_sprites:
             i.draw(pixelated=True)
         self.scene.draw(pixelated=True)
-        self.pickup_sprite.draw()
-        self.player_sprite.draw()
+        self.player_sprite.draw(pixelated=True)
         if self.current_level == 1:
             for text in self.text[self.current_level-1]:
                 arcade.draw_text(
@@ -129,6 +147,8 @@ class GameWindow(arcade.Window):
                     30,
                     font_name="Kenney High Square"
                 )
+            self.pickup_sprite.draw(pixelated=True)
+            self.ostrich.draw(pixelated=True)
 
         if self.debug_enabled:
             self.player_sprite.draw_hit_box((255, 0, 0), 2)
