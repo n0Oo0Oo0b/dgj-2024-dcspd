@@ -38,9 +38,6 @@ class PlayerSprite(arcade.Sprite):
         }
         self.texture = self.texture_map['idle']
 
-
-        self.level_1_unlocked = True
-
     def on_update(self, delta_time: float = 1 / 60):
         # Update attributes
         game = self.game_window
