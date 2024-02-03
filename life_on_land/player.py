@@ -85,6 +85,10 @@ class PlayerSprite(arcade.Sprite):
             self.position = [round(self.grounded_position[0] / 32, 0) * 32 + difference * 16, self.grounded_position[1]]
             self.velocity = [0, 0]
 
+        if self.position[0] > 14200:
+            self.game_window.current_level = 2
+            self.game_window.load_level("desert.tmx")
+            self.position = [0, 0]
         self.special.on_update()
 
     def draw(self, **kwargs):
