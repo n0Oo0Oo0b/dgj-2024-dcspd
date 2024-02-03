@@ -1,10 +1,9 @@
 from typing import TYPE_CHECKING
 
 import arcade
-from pyglet.math import Vec2
 
 from life_on_land.constants import *
-from life_on_land.level_effects import *
+from life_on_land.level_effects import FireHoseEffect
 
 if TYPE_CHECKING:
     from life_on_land.game import GameWindow
@@ -37,9 +36,6 @@ class PlayerSprite(arcade.Sprite):
             'side': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Side" / "Side.png")
         }
         self.texture = self.texture_map['idle']
-
-
-        self.level_1_unlocked = True
 
     def on_update(self, delta_time: float = 1 / 60):
         # Update attributes

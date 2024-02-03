@@ -45,6 +45,7 @@ class GameWindow(arcade.Window):
         self.tilemap: arcade.TileMap | None = None
         self.scene: arcade.Scene | None = None
         self.engine: arcade.physics_engines.PhysicsEnginePlatformer | None = None
+        self.objective_sprites: arcade.SpriteList = arcade.SpriteList()
         self.load_level("forest-final.tmx")
 
     def load_level(self, level_name: str):
@@ -52,14 +53,23 @@ class GameWindow(arcade.Window):
         self.scene = arcade.Scene.from_tilemap(self.tilemap)
         self.ost = arcade.load_sound(ASSET_PATH / 'sounds' / 'Forest.wav')
         arcade.play_sound(self.ost, 0.8, 0.0, True, 1)
+        self.objective_sprites.clear()
 
         # Seems like it wasn't intended to use object layers in Tiled
         object_layer: ObjectLayer = self.tilemap.get_tilemap_layer("Game")  # type: ignore
+        total_height = self.tilemap.height * self.tilemap.tile_height
         for obj in object_layer.tiled_objects:
+            obj_x, obj_y = obj.coordinates
+            obj_y = total_height - obj_y
             if obj.name == "Player":
-                player_x, player_y = obj.coordinates
-                total_height = self.tilemap.height * self.tilemap.tile_height
-                self.player_sprite.position = player_x, total_height - player_y
+                self.player_sprite.position = obj_x, obj_y
+            elif obj.name == "Objective":
+                sprite = arcade.Sprite(
+                    ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png",
+                    center_x=obj_x,
+                    center_y=obj_y,
+                )
+                self.objective_sprites.append(sprite)
 
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
@@ -78,8 +88,8 @@ class GameWindow(arcade.Window):
         self.clear()
         self.camera_sprites.use()
         self.scene.draw(pixelated=True)
+        self.objective_sprites.draw()
         self.player_sprite.draw()
-
 
     def on_key_press(self, key, modifiers):
         if key in {arcade.key.ESCAPE, arcade.key.Q}:
