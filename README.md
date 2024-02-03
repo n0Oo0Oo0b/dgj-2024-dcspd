@@ -11,3 +11,10 @@ Requirements: python 3.11
 3. (Optional, but recommended) create a venv (`python -m venv venv`) and activate it (system dependent)
 4. Install requirements: `pip install -r requirements.txt`
 5. Run the game: `python -m life_on_land`
+
+## How to play
+
+- WASD / Arrow keys to move
+- Q / Escape to exit
+- Space to use special ability
+- E / C to resolve an objective
