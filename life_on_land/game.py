@@ -27,6 +27,7 @@ class GameWindow(arcade.Window):
         self.camera_sprites = arcade.Camera(self.width, self.height)
         self.current_level: Level = Level.GRASS
         self.player_sprite: PlayerSprite = PlayerSprite(self)
+        self.ost = None
 
         # Inputs
         k = arcade.key
@@ -51,6 +52,8 @@ class GameWindow(arcade.Window):
     def load_level(self, level_name: str):
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
         self.scene = arcade.Scene.from_tilemap(self.tilemap)
+        self.ost = arcade.load_sound(ASSET_PATH / 'sounds' / 'Forest.wav')
+        arcade.play_sound(self.ost, 0.8, 0.0, True, 1)
         self.objective_sprites.clear()
 
         # Seems like it wasn't intended to use object layers in Tiled
