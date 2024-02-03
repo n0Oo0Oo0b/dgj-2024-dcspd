@@ -33,16 +33,15 @@ class PlayerSprite(arcade.Sprite):
         self.grounded_position = [0, 0]
         self.game_window: "GameWindow" = game_window
         self.special = NoEffect(self)
-        self.texture_map: dict[Literal["idle", "walk", "side"], arcade.Texture] = {}
-        self.load_textures(self.game_window.current_level)
-        self.texture = self.texture_map['idle']
+        self.texture_map: dict[Literal["idle", "walk", "side"], list[arcade.Texture]] = {}
+        self.load_textures(self.TEXTURE_PATH / self.MAP[self.game_window.current_level])
+        self.texture = self.texture_map['idle'][0]
 
-    def load_textures(self, level: Level):
-        textures = self.TEXTURE_PATH / self.MAP[level]
+    def load_textures(self, texture_dir):
         self.texture_map = {
-            "idle": arcade.load_texture(textures / "Front" / "Front.png"),
-            "walk": arcade.load_texture(textures / "Run" / "SideRun.png"),
-            "side": arcade.load_texture(textures / "Side" / "Side.png"),
+            "idle": arcade.load_texture_pair(texture_dir / "Front" / "Front.png"),
+            "walk": arcade.load_texture_pair(texture_dir / "Run" / "SideRun.png"),
+            "side": arcade.load_texture_pair(texture_dir / "Side" / "Side.png"),
         }
 
     def on_update(self, delta_time: float = 1 / 60):
@@ -56,16 +55,17 @@ class PlayerSprite(arcade.Sprite):
         right_pressed = InputType.RIGHT in game.pressed_inputs
         left_pressed = InputType.LEFT in game.pressed_inputs
         target_vel = (right_pressed - left_pressed) * self.PLAYER_SPEED
+        facing = 1 if target_vel < 0 else 0
         if target_vel:
             if 3 < self.animation_tick_count < 10:
-                self.texture = self.texture_map["walk"]
+                self.texture = self.texture_map["walk"][facing]
             else:
-                self.texture = self.texture_map["side"]
+                self.texture = self.texture_map["side"][facing]
             if self.animation_tick_count == 10:
                 self.animation_tick_count = 0
             self.animation_tick_count += 1
         else:
-            self.texture = self.texture_map["idle"]
+            self.texture = self.texture_map["idle"][facing]
 
         vel_diff = target_vel - self.velocity[0]
         self.velocity[0] += vel_diff * self.FRICTION_FACTOR
@@ -94,3 +94,4 @@ class PlayerSprite(arcade.Sprite):
     def apply_special(self):
         effect_cls = EFFECT_MAPPING[self.game_window.current_level]
         self.special = effect_cls(self)
+        self.load_textures(self.TEXTURE_PATH / "GrassWithHose")
