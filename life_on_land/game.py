@@ -1,17 +1,25 @@
 import arcade
+from pyglet.math import Vec2
+from pytiled_parser import ObjectLayer
 
 from life_on_land.constants import *
 from life_on_land.player import PlayerSprite
 
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
-SCREEN_TITLE = "Life on Land"
-INPUT_BUFFER_DURATION = 0.1
-
 
 class GameWindow(arcade.Window):
+    SCREEN_WIDTH = 1280
+    SCREEN_HEIGHT = 720
+    SCREEN_TITLE = "Life on Land"
+    INPUT_BUFFER_DURATION = 0.1
+    LEVEL_DIR = ASSET_PATH / "levels"
+
     def __init__(self):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
+        super().__init__(
+            self.SCREEN_WIDTH,
+            self.SCREEN_HEIGHT,
+            self.SCREEN_TITLE,
+            resizable=True,
+        )
 
         # Game related
         self.player_sprite: PlayerSprite = PlayerSprite(self)
@@ -30,8 +38,25 @@ class GameWindow(arcade.Window):
         self.last_pressed: dict[InputType, float] = {}
         self.pressed_inputs: set[InputType] = set()
 
-        self.tilemap: arcade.TileMap = arcade.load_tilemap(":resources:tiled_maps/map.json", 0.3)
-        self.scene: arcade.Scene = arcade.Scene.from_tilemap(self.tilemap)
+        # self.tilemap: arcade.TileMap = arcade.load_tilemap(":resources:tiled_maps/map.json", 0.3)
+        # self.scene: arcade.Scene = arcade.Scene.from_tilemap(self.tilemap)
+        self.tilemap: arcade.TileMap | None = None
+        self.scene: arcade.Scene | None = None
+        self.engine: arcade.physics_engines.PhysicsEnginePlatformer | None = None
+        self.load_level("test.tmx")
+
+    def load_level(self, level_name: str):
+        self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
+        self.scene = arcade.Scene.from_tilemap(self.tilemap)
+
+        # Seems like it wasn't intended to use object layers in Tiled
+        object_layer: ObjectLayer = self.tilemap.get_tilemap_layer("Game")  # type: ignore
+        for obj in object_layer.tiled_objects:
+            if obj.name == "Player":
+                player_x, player_y = obj.coordinates
+                total_height = self.tilemap.height * self.tilemap.tile_height
+                self.player_sprite.position = player_x, total_height - player_y
+
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
             walls=self.scene["Platforms"],
@@ -68,7 +93,7 @@ class GameWindow(arcade.Window):
         self.pressed_inputs.discard(type_)
 
     def is_buffered(self, key: InputType):
-        return self.last_pressed.get(key, -1) + INPUT_BUFFER_DURATION > self.global_time
+        return self.last_pressed.get(key, -1) + self.INPUT_BUFFER_DURATION > self.global_time
 
     def consume_buffer(self, key: InputType):
         self.last_pressed[key] = -1
@@ -84,5 +109,5 @@ class GameWindow(arcade.Window):
             screen_center_y = 0
 
         # Here's our center, move to it
-        player_centered = screen_center_x, screen_center_y
+        player_centered = Vec2(screen_center_x, screen_center_y)
         self.camera_sprites.move_to(player_centered)
