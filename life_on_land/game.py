@@ -44,7 +44,7 @@ class GameWindow(arcade.Window):
         self.tilemap: arcade.TileMap | None = None
         self.scene: arcade.Scene | None = None
         self.engine: arcade.physics_engines.PhysicsEnginePlatformer | None = None
-        self.load_level("test.tmx")
+        self.load_level("forest-final.tmx")
 
     def load_level(self, level_name: str):
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
