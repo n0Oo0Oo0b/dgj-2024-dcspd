@@ -1,3 +1,4 @@
+import random
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -7,6 +8,10 @@ from life_on_land.constants import *
 
 if TYPE_CHECKING:
     from life_on_land.player import PlayerSprite
+
+
+def glob_textures(fp: Path) -> list[arcade.Texture]:
+    return [arcade.load_texture(file) for file in sorted(fp.iterdir())]
 
 
 class LevelEffect(ABC):
@@ -35,7 +40,7 @@ class WaterEmitController(arcade.EmitController):
         self.effect_obj = effect
 
     def how_many(self, delta_time: float, current_particle_count: int) -> int:
-        return self.effect_obj.is_launching
+        return self.effect_obj.is_launching * 5
 
     def is_complete(self) -> bool:
         return False
@@ -46,7 +51,7 @@ class FireHoseEffect(LevelEffect):
     LAUNCH_ACCEL_FACTOR = 0.2
     LAUNCH_DURATION = 0.5
     BURST_PARTICLE_COUNT = 200
-    WATER_TEXTURE = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
+    WATER_TEXTURE = glob_textures(ASSET_PATH / "textures" / "MISC" / "Particles" / "Water")
 
     def __init__(self, player: "PlayerSprite"):
         super().__init__(player)
@@ -56,7 +61,7 @@ class FireHoseEffect(LevelEffect):
             (0, -16),
             WaterEmitController(self),
             particle_factory=lambda emitter: arcade.FadeParticle(
-                self.WATER_TEXTURE,
+                random.choice(self.WATER_TEXTURE),
                 arcade.rand_vec_spread_deg(-90, 50, 3),
                 0.8,
                 self.player.position,
