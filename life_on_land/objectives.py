@@ -2,8 +2,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import arcade
+from pyglet.math import Vec2
 
-from life_on_land.constants import ASSET_PATH, Level
+from life_on_land.constants import ASSET_PATH, Level, InputType
 
 if TYPE_CHECKING:
     from life_on_land.game import GameWindow
@@ -28,6 +29,15 @@ class ObjectiveSprite(arcade.Sprite):
         self.position[1] += self.texture.height * 1.25
 
         self.game_window = game_window
+
+    def update(self):
+        game = self.game_window
+        diff = Vec2(*game.player_sprite.position) - Vec2(*self.position)
+        if diff.mag > 120:
+            return
+        if game.is_buffered(InputType.TALK):
+            game.consume_buffer(InputType.TALK)
+            self.resolve()
 
     def resolve(self):
         self.texture = self.texture_map["after"]
