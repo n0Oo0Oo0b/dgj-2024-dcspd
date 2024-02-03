@@ -46,8 +46,6 @@ class PlayerSprite(arcade.Sprite):
         }
 
     def on_update(self, delta_time: float = 1 / 60):
-        print(self.position)
-
         # Update attributes
         game = self.game_window
         if game.engine.can_jump():
@@ -84,7 +82,6 @@ class PlayerSprite(arcade.Sprite):
             difference = -1
             if self.position[0] < self.grounded_position[0]:
                 difference = +1
-            print(self.grounded_position[0] / 32)
             self.position = [round(self.grounded_position[0] / 32, 0) * 32 + difference * 16, self.grounded_position[1]]
             self.velocity = [0, 0]
 

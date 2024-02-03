@@ -11,6 +11,7 @@ class InputType(IntEnum):
     LEFT = 2
     RIGHT = 3
     SPECIAL = 4
+    TALK = 5
 
 
 class Level(IntEnum):
