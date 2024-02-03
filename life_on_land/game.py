@@ -32,12 +32,8 @@ class GameWindow(arcade.Window):
         self.background = ASSET_PATH / "textures" / "GRASS" / "Game Jam Background - Thorgatus.gif"
         self.debug_enabled: bool = False
         self.update_engine: bool = True
-        self.background_sprites = [arcade.Sprite(self.background, 4) for i in range(56)]
+        self.background_sprite = arcade.Sprite(self.background, 4)
         count = 0
-        for j in range(4)[::-1]:
-            for i in range(14):
-                self.background_sprites[count].position = [(i - j/2) * 2160, j * (732 - 240) + 350]
-                count += 1
 
         # Inputs
         k = arcade.key
@@ -61,6 +57,7 @@ class GameWindow(arcade.Window):
         self.pickup_sprite: arcade.Sprite | None = None
         self.camera_end = 0
         self.load_level("forest-final.tmx")
+
 
     def load_level(self, level_name: str):
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
@@ -106,9 +103,12 @@ class GameWindow(arcade.Window):
 
         self.center_camera_to_player()
 
+        self.background_sprite.center_x = self.camera_sprites.position[0] + self.SCREEN_WIDTH/2
+        self.background_sprite.center_y = self.camera_sprites.position[1] + self.SCREEN_HEIGHT/2
+
     def on_draw(self):
         self.clear()
-        for sprite in self.background_sprites: sprite.draw()
+        self.background_sprite.draw()
         self.camera_sprites.use()
         self.scene.draw(pixelated=True)
         self.objective_sprites.draw()
@@ -151,6 +151,7 @@ class GameWindow(arcade.Window):
         self.last_pressed[key] = -1
 
     def center_camera_to_player(self):
+        print(self.camera_end)
         screen_center_x = self.player_sprite.center_x - (self.camera_sprites.viewport_width / 2)
         screen_center_y = self.player_sprite.center_y - (self.camera_sprites.viewport_height / 2)
 
