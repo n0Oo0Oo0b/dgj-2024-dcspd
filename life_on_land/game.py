@@ -62,7 +62,6 @@ class GameWindow(arcade.Window):
         self.camera_end = 0
         self.load_level("forest-final.tmx")
 
-
     def load_level(self, level_name: str):
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
         self.scene = arcade.Scene.from_tilemap(self.tilemap)
