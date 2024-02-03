@@ -44,9 +44,9 @@
   <image width="32" height="32" source="../textures/MISC/Spikes/spike-sand.png"/>
  </tile>
  <tile id="14">
-  <image width="32" height="32" source="../../../../Downloads/SAND-edge-left-diagonal.png"/>
+  <image width="32" height="32" source="../textures/DESERT/SAND/SAND-DEFAULT/SAND-edge-left-diagonal.png"/>
  </tile>
  <tile id="15">
-  <image width="32" height="32" source="../../../../Downloads/SAND-edge-right-diagonal.png"/>
+  <image width="32" height="32" source="../textures/DESERT/SAND/SAND-DEFAULT/SAND-edge-right-diagonal.png"/>
  </tile>
 </tileset>
