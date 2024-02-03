@@ -29,6 +29,8 @@ class GameWindow(arcade.Window):
         self.current_level: Level = Level.GRASS
         self.player_sprite: PlayerSprite = PlayerSprite(self)
         self.ost = None
+        self.debug_enabled: bool = False
+        self.update_engine: bool = True
 
         # Inputs
         k = arcade.key
@@ -79,7 +81,8 @@ class GameWindow(arcade.Window):
     def on_update(self, delta_time: float):
         self.global_time += delta_time
 
-        self.engine.update()
+        if self.update_engine:
+            self.engine.update()
         self.player_sprite.on_update(delta_time)
 
         if self.player_sprite.collides_with_sprite(self.pickup_sprite):
@@ -96,10 +99,18 @@ class GameWindow(arcade.Window):
         self.pickup_sprite.draw()
         self.player_sprite.draw()
 
+        if self.debug_enabled:
+            self.player_sprite.draw_hit_box((255, 0, 0), 2)
+            self.objective_sprites.draw_hit_boxes((0, 0, 255), 2)
+
     def on_key_press(self, key, modifiers):
         if key in {arcade.key.ESCAPE, arcade.key.Q}:
             self.close()
             return
+        elif key == arcade.key.GRAVE:
+            self.debug_enabled = not self.debug_enabled
+        elif key == arcade.key.P and self.debug_enabled:
+            self.update_engine = not self.update_engine
 
         if (type_ := self.control_map.get(key)) is None:
             return
@@ -110,6 +121,12 @@ class GameWindow(arcade.Window):
         if (type_ := self.control_map.get(key)) is None:
             return
         self.pressed_inputs.discard(type_)
+
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        if self.debug_enabled and button == 1:
+            target = self.camera_sprites.position + Vec2(x, y)
+            self.player_sprite.position = target
+            self.player_sprite.velocity = [0, 0]
 
     def is_buffered(self, key: InputType):
         return self.last_pressed.get(key, -1) + self.INPUT_BUFFER_DURATION > self.global_time
