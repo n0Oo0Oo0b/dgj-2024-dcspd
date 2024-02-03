@@ -3,6 +3,7 @@ from pyglet.math import Vec2
 from pytiled_parser import ObjectLayer
 
 from life_on_land.constants import *
+from life_on_land.objectives import ObjectiveSprite
 from life_on_land.pickups import PickupSprite
 from life_on_land.player import PlayerSprite
 
@@ -37,6 +38,7 @@ class GameWindow(arcade.Window):
             | dict.fromkeys([k.LEFT, k.A], InputType.LEFT)
             | dict.fromkeys([k.RIGHT, k.D], InputType.RIGHT)
             | dict.fromkeys([k.SPACE], InputType.SPECIAL)
+            | dict.fromkeys([k.E, k.C], InputType.TALK)
         )
         self.last_pressed: dict[InputType, float] = {}
         self.pressed_inputs: set[InputType] = set()
@@ -65,18 +67,13 @@ class GameWindow(arcade.Window):
             if obj.name == "Player":
                 self.player_sprite.position = obj_x, obj_y
             elif obj.name == "Objective":
-                sprite = arcade.Sprite(
-                    ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png",
-                    center_x=obj_x,
-                    center_y=obj_y,
-                )
-                self.objective_sprites.append(sprite)
+                self.objective_sprites.append(ObjectiveSprite(self, (obj_x, obj_y)))
             elif obj.name == "Unlock":
                 self.pickup_sprite = PickupSprite(self, (obj_x, obj_y))
 
         self.engine = arcade.physics_engines.PhysicsEnginePlatformer(
             self.player_sprite,
-            walls=self.scene["Platforms"],
+            walls=[self.scene["Platforms"], self.objective_sprites],
         )
 
     def on_update(self, delta_time: float):
