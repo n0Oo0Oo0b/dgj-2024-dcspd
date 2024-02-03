@@ -25,15 +25,16 @@ class GameWindow(arcade.Window):
 
         # Game related
         self.global_time: float = 0
-        self.camera_sprites = arcade.Camera(self.width, self.height)
         self.current_level: Level = Level.GRASS
-        self.player_sprite: PlayerSprite = PlayerSprite(self)
         self.ost = None
+
+        self.camera_sprites = arcade.Camera(self.width, self.height)
+        self.player_sprite: PlayerSprite = PlayerSprite(self)
         self.background = ASSET_PATH / "textures" / "GRASS" / "Game Jam Background - Thorgatus.gif"
+        self.background_sprite = arcade.Sprite(self.background, 4)
+
         self.debug_enabled: bool = False
         self.update_engine: bool = True
-        self.background_sprite = arcade.Sprite(self.background, 4)
-        count = 0
 
         # Inputs
         k = arcade.key
@@ -61,7 +62,6 @@ class GameWindow(arcade.Window):
                       ["We must retrieve the fire hose from the fire house!", 2700, 430],
                       ["Pick up the fire hose (hold space to boost)", 1400, 850],
                       ["Press E to put out fires", 3300, 230]]]
-
 
     def load_level(self, level_name: str):
         self.tilemap = arcade.load_tilemap(self.LEVEL_DIR / level_name)
@@ -114,24 +114,25 @@ class GameWindow(arcade.Window):
         self.clear()
         self.background_sprite.draw()
         self.camera_sprites.use()
+        for i in self.objective_sprites:
+            i.draw(pixelated=True)
         self.scene.draw(pixelated=True)
-        self.objective_sprites.draw(pixelated=True)
         self.pickup_sprite.draw()
         self.player_sprite.draw()
         if self.current_level == 1:
             for text in self.text[self.current_level-1]:
-                arcade.draw_text(text[0],
-                     text[1],
-                     text[2],
-                     arcade.color.BLACK,
-                     30,
-                     font_name="Kenney High Square")
+                arcade.draw_text(
+                    text[0],
+                    text[1],
+                    text[2],
+                    arcade.color.BLACK,
+                    30,
+                    font_name="Kenney High Square"
+                )
 
         if self.debug_enabled:
             self.player_sprite.draw_hit_box((255, 0, 0), 2)
             self.objective_sprites.draw_hit_boxes((0, 0, 255), 2)
-            print(self.player_sprite.position)
-
 
     def on_key_press(self, key, modifiers):
         if key in {arcade.key.ESCAPE, arcade.key.Q}:
