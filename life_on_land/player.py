@@ -88,7 +88,6 @@ class PlayerSprite(arcade.Sprite):
         if self.position[0] > 14200:
             self.game_window.current_level = 2
             self.game_window.load_level("desert.tmx")
-            self.position = [0, 0]
         self.special.on_update()
 
     def draw(self, **kwargs):
