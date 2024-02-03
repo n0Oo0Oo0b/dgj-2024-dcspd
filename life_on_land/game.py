@@ -47,6 +47,7 @@ class GameWindow(arcade.Window):
         self.scene: arcade.Scene | None = None
         self.engine: arcade.physics_engines.PhysicsEnginePlatformer | None = None
         self.objective_sprites: arcade.SpriteList = arcade.SpriteList()
+        self.danger_sprites: arcade.SpriteList = arcade.SpriteList()
         self.load_level("forest-final.tmx")
 
     def load_level(self, level_name: str):
@@ -55,6 +56,9 @@ class GameWindow(arcade.Window):
         self.ost = arcade.load_sound(ASSET_PATH / 'sounds' / 'Forest.wav')
         arcade.play_sound(self.ost, 0.8, 0.0, True, 1)
         self.objective_sprites.clear()
+        self.danger_sprites = self.scene["Danger"]
+        for sprite in self.danger_sprites:
+            sprite._points = [(0, 0), (32, 0), (32, 1), (0, 1)]
 
         # Seems like it wasn't intended to use object layers in Tiled
         object_layer: ObjectLayer = self.tilemap.get_tilemap_layer("Game")  # type: ignore
@@ -87,9 +91,16 @@ class GameWindow(arcade.Window):
 
     def on_draw(self):
         self.clear()
-        arcade.draw_lrwh_rectangle_textured(0, 0,
-                                            self.SCREEN_WIDTH, self.SCREEN_HEIGHT,
-                                            self.background)
+        for j in range(4)[::-1]:
+            for i in range(14):
+                arcade.draw_lrwh_rectangle_textured(
+                    (i - j/2) * self.SCREEN_WIDTH,
+                    j * (self.SCREEN_HEIGHT - 240),
+                    self.SCREEN_WIDTH,
+                    self.SCREEN_HEIGHT,
+                    self.background,
+                )
+
         self.camera_sprites.use()
         self.scene.draw(pixelated=True)
         self.objective_sprites.draw()
@@ -121,10 +132,8 @@ class GameWindow(arcade.Window):
         screen_center_y = self.player_sprite.center_y - (self.camera_sprites.viewport_height / 2)
 
         # Set some limits on how far we scroll
-        if screen_center_x < 0:
-            screen_center_x = 0
-        if screen_center_y < 0:
-            screen_center_y = 0
+        screen_center_x = min(max(screen_center_x, 0), 13000)
+        screen_center_y = max(screen_center_y, 0)
 
         # Here's our center, move to it
         player_centered = Vec2(screen_center_x, screen_center_y)

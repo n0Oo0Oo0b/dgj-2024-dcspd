@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 import arcade
+import math
 
 from life_on_land.constants import *
 from life_on_land.level_effects import FireHoseEffect
@@ -39,6 +40,8 @@ class PlayerSprite(arcade.Sprite):
         self.texture = self.texture_map['idle']
 
     def on_update(self, delta_time: float = 1 / 60):
+        print(self.position)
+
         # Update attributes
         game = self.game_window
         if game.engine.can_jump():
@@ -71,8 +74,12 @@ class PlayerSprite(arcade.Sprite):
             game.consume_buffer(InputType.UP)
             self.velocity[1] = self.PLAYER_JUMP_FORCE
 
-        if self.position[1] < - 256:
-            self.position = self.grounded_position
+        if self.position[1] < - 256 or self.collides_with_list(game.danger_sprites):
+            difference = -1
+            if self.position[0] < self.grounded_position[0]:
+                difference = +1
+            print(self.grounded_position[0] / 32)
+            self.position = [round(self.grounded_position[0] / 32, 0) * 32 + difference * 16, self.grounded_position[1]]
             self.velocity = [0, 0]
 
         self.special.on_update()
