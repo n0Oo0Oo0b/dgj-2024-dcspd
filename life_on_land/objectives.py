@@ -1,3 +1,4 @@
+import random
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -29,16 +30,39 @@ class ObjectiveSprite(arcade.Sprite):
         self.position[1] += self.texture.height * 1.25
 
         self.game_window = game_window
+        self.e: arcade.Emitter | None = None
+
+    @staticmethod
+    def random_target(src, dest):
+        x2, y2 = dest
+        rand_dest = arcade.rand_in_rect((x2-16, y2-40), 32, 80)
+        return (Vec2(*src) - Vec2(*rand_dest)).scale(-0.05)
 
     def update(self):
+        if self.e:
+            self.e.update()
+
         game = self.game_window
         diff = Vec2(*game.player_sprite.position) - Vec2(*self.position)
         if diff.mag > 120:
             return
         if game.is_buffered(InputType.TALK):
             game.consume_buffer(InputType.TALK)
-            self.resolve()
+            self.texture = self.texture_map["after"]
+            self.hit_box = [(0, 0)]
+            water_textures = list((ASSET_PATH / "textures" / "MISC" / "Particles" / "Water").iterdir())
+            self.e = arcade.Emitter(
+                self.game_window.player_sprite.position,
+                arcade.EmitBurst(150),
+                lambda emitter: arcade.FadeParticle(
+                    random.choice(water_textures),
+                    self.random_target(game.player_sprite.position, self.position),  # type: ignore
+                    0.5,
+                )
+            )
 
-    def resolve(self):
-        self.texture = self.texture_map["after"]
-        self.hit_box = [(0, 0)]
+    def draw(self, **kwargs):
+        super().draw(**kwargs)
+        if self.e:
+            self.e.draw()
+
