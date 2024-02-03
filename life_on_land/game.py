@@ -22,10 +22,10 @@ class GameWindow(arcade.Window):
         )
 
         # Game related
-        self.player_sprite: PlayerSprite = PlayerSprite(self)
         self.global_time: float = 0
         self.camera_sprites = arcade.Camera(self.width, self.height)
         self.current_level: Level = Level.GRASS
+        self.player_sprite: PlayerSprite = PlayerSprite(self)
 
         # Inputs
         k = arcade.key
