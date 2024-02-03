@@ -164,28 +164,28 @@
 </data>
  </layer>
  <objectgroup id="3" name="Game">
-  <object id="2" name="START" x="82.6446" y="1491.2">
+  <object id="2" name="Player" x="82.6446" y="1491.2">
    <properties>
     <property name="START" value=""/>
    </properties>
    <point/>
   </object>
-  <object id="4" name="objective" x="2063.84" y="1521.8">
+  <object id="4" name="Objective" x="2063.84" y="1521.8">
    <point/>
   </object>
-  <object id="5" name="objective" x="1886.97" y="813.697">
+  <object id="5" name="Objective" x="1886.97" y="813.697">
    <point/>
   </object>
-  <object id="6" name="objective" x="1598.47" y="1500.56">
+  <object id="6" name="Objective" x="1598.47" y="1500.56">
    <point/>
   </object>
-  <object id="7" name="objective" x="3553.81" y="735.647">
+  <object id="7" name="Objective" x="3553.81" y="735.647">
    <point/>
   </object>
-  <object id="8" name="objective" x="5741.68" y="1498.64">
+  <object id="8" name="Objective" x="5741.68" y="1498.64">
    <point/>
   </object>
-  <object id="9" name="END" x="6262.73" y="1496.95">
+  <object id="9" name="End" x="6262.73" y="1496.95">
    <point/>
   </object>
  </objectgroup>
