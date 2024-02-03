@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="grass" tilewidth="32" tileheight="32" tilecount="14" columns="0">
+<tileset version="1.10" tiledversion="1.10.2" name="grass" tilewidth="32" tileheight="32" tilecount="16" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <image width="32" height="32" source="../textures/GRASS/GRASS.png"/>
@@ -42,5 +42,11 @@
  </tile>
  <tile id="13">
   <image width="32" height="32" source="../textures/MISC/Spikes/spike-sand.png"/>
+ </tile>
+ <tile id="14">
+  <image width="32" height="32" source="../../../../Downloads/SAND-edge-left-diagonal.png"/>
+ </tile>
+ <tile id="15">
+  <image width="32" height="32" source="../../../../Downloads/SAND-edge-right-diagonal.png"/>
  </tile>
 </tileset>

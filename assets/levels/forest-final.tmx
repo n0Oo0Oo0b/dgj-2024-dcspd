@@ -222,28 +222,28 @@
    </properties>
    <point/>
   </object>
-  <object id="3" name="Objective" x="3111.35" y="3037.61">
+  <object id="3" name="Objective" x="3139.58" y="3038.74">
    <properties>
     <property name="tooltip" value="Put out the fire!"/>
    </properties>
    <point/>
   </object>
-  <object id="7" name="Objective" x="4529.79" y="3093.09">
+  <object id="7" name="Objective" x="4533.18" y="3103.25">
    <point/>
   </object>
-  <object id="8" name="Objective" x="4975.5" y="2517.78">
+  <object id="8" name="Objective" x="4972.11" y="2526.81">
    <point/>
   </object>
   <object id="12" name="Objective" x="8594.68" y="3038.56">
    <point/>
   </object>
-  <object id="21" name="Objective" x="10810.3" y="2385.51">
+  <object id="21" name="Objective" x="10813.7" y="2430.68">
    <properties>
     <property name="tooltip" value="Put out the fire!"/>
    </properties>
    <point/>
   </object>
-  <object id="22" name="Objective" x="11429.3" y="1841.97">
+  <object id="22" name="Objective" x="11434.9" y="1916.5">
    <properties>
     <property name="tooltip" value="Put out the fire!"/>
    </properties>
@@ -252,28 +252,25 @@
   <object id="23" name="End" x="14511.8" y="2991.45">
    <point/>
   </object>
-  <object id="24" name="Objective" x="9974.1" y="2885.26">
+  <object id="24" name="Objective" x="9995.55" y="2911.23">
    <point/>
   </object>
-  <object id="25" name="Objective" x="11458.2" y="2193.73">
+  <object id="25" name="Objective" x="11457.1" y="2205.02">
    <properties>
     <property name="tooltip" value="Put out the fire!"/>
    </properties>
    <point/>
   </object>
-  <object id="26" name="Objective" x="11385.7" y="2667.7">
+  <object id="26" name="Objective" x="11378.9" y="2685.77">
    <properties>
     <property name="tooltip" value="Put out the fire!"/>
    </properties>
    <point/>
   </object>
-  <object id="28" name="Objective" x="9427.78" y="2721.82">
+  <object id="28" name="Objective" x="9423.26" y="2750.05">
    <properties>
     <property name="tooltip" value="Put out the fire!"/>
    </properties>
-   <point/>
-  </object>
-  <object id="29" x="9440.46" y="2787.46">
    <point/>
   </object>
  </objectgroup>
