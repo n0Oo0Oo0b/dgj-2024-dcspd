@@ -57,6 +57,10 @@ class GameWindow(arcade.Window):
         self.pickup_sprite: arcade.Sprite | None = None
         self.camera_end = 0
         self.load_level("forest-final.tmx")
+        self.text = [[["OH NO THE TREES ARE ON FIRE!", 2700, 480],
+                      ["We must retrieve the fire hose from the fire house!", 2700, 430],
+                      ["Pick up the fire hose (hold space to boost)", 1400, 850],
+                      ["Press E to put out fires", 3300, 230]]]
 
 
     def load_level(self, level_name: str):
@@ -111,13 +115,23 @@ class GameWindow(arcade.Window):
         self.background_sprite.draw()
         self.camera_sprites.use()
         self.scene.draw(pixelated=True)
-        self.objective_sprites.draw()
+        self.objective_sprites.draw(pixelated=True)
         self.pickup_sprite.draw()
         self.player_sprite.draw()
+        if self.current_level == 1:
+            for text in self.text[self.current_level-1]:
+                arcade.draw_text(text[0],
+                     text[1],
+                     text[2],
+                     arcade.color.BLACK,
+                     30,
+                     font_name="Kenney High Square")
 
         if self.debug_enabled:
             self.player_sprite.draw_hit_box((255, 0, 0), 2)
             self.objective_sprites.draw_hit_boxes((0, 0, 255), 2)
+            print(self.player_sprite.position)
+
 
     def on_key_press(self, key, modifiers):
         if key in {arcade.key.ESCAPE, arcade.key.Q}:
@@ -151,7 +165,6 @@ class GameWindow(arcade.Window):
         self.last_pressed[key] = -1
 
     def center_camera_to_player(self):
-        print(self.camera_end)
         screen_center_x = self.player_sprite.center_x - (self.camera_sprites.viewport_width / 2)
         screen_center_y = self.player_sprite.center_y - (self.camera_sprites.viewport_height / 2)
 
