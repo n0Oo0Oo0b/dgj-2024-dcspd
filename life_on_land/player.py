@@ -46,8 +46,6 @@ class PlayerSprite(arcade.Sprite):
         }
 
     def on_update(self, delta_time: float = 1 / 60):
-        print(self.position)
-
         # Update attributes
         game = self.game_window
         if game.engine.can_jump():
