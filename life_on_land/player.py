@@ -1,29 +1,43 @@
 from typing import TYPE_CHECKING
 
 import arcade
+from pyglet.math import Vec2
 
 from life_on_land.constants import *
+from life_on_land.level_effects import *
 
 if TYPE_CHECKING:
     from life_on_land.game import GameWindow
 
 
-FRICTION_FACTOR = 0.4
-PLAYER_SPEED = 5
-PLAYER_JUMP_FORCE = 10
-COYOTE_DURATION = 0.1
-
-
 class PlayerSprite(arcade.Sprite):
+    FRICTION_FACTOR = 0.4
+    PLAYER_SPEED = 5
+    PLAYER_JUMP_FORCE = 10
+    COYOTE_DURATION = 0.1
+    MAP = {
+        1: "GrassBiome",
+        2: "DesertBiome",
+        3: "IceBiome"
+    }
+
     def __init__(self, game_window: "GameWindow"):
         super().__init__(
             scale=2,
         )
-        self.texture = arcade.load_texture(ASSET_PATH / "player" / "idle-test.png")
-        self.position = [100, 75]
 
+        self.animation_tick_count = 0
+        self.position = [100, 75]
         self.last_grounded: float = -1
         self.game_window: "GameWindow" = game_window
+        self.special = FireHoseEffect(self)
+        self.texture_map = {
+            'idle': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Front" / "Front.png"),
+            'walk': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Run" / "SideRun.png"),
+            'side': arcade.load_texture(ASSET_PATH / "player" / "Hero" / self.MAP[self.game_window.current_level] / "Side" / "Side.png")
+        }
+        self.texture = self.texture_map['idle']
+
 
         self.level_1_unlocked = True
 
@@ -36,25 +50,31 @@ class PlayerSprite(arcade.Sprite):
         # X movement
         right_pressed = InputType.RIGHT in game.pressed_inputs
         left_pressed = InputType.LEFT in game.pressed_inputs
-        target_vel = (right_pressed - left_pressed) * PLAYER_SPEED
+        target_vel = (right_pressed - left_pressed) * self.PLAYER_SPEED
+        if target_vel:
+            if 3 < self.animation_tick_count < 10:
+                self.texture = self.texture_map["walk"]
+            else:
+                self.texture = self.texture_map["side"]
+            if self.animation_tick_count == 10:
+                self.animation_tick_count = 0
+            self.animation_tick_count += 1
+        else:
+            self.texture = self.texture_map["idle"]
 
         vel_diff = target_vel - self.velocity[0]
-        self.velocity[0] += vel_diff * FRICTION_FACTOR
+        self.velocity[0] += vel_diff * self.FRICTION_FACTOR
 
         # Y movement (jump)
         if (
-            game.is_buffered(InputType.UP)
-            and self.last_grounded + COYOTE_DURATION >= game.global_time
+                game.is_buffered(InputType.UP)
+                and self.last_grounded + self.COYOTE_DURATION >= game.global_time
         ):
             game.consume_buffer(InputType.UP)
-            self.velocity[1] = PLAYER_JUMP_FORCE
+            self.velocity[1] = self.PLAYER_JUMP_FORCE
 
-        if self.level_1_unlocked:
-            self.level_1_special()
+        self.special.on_update()
 
-    def level_1_special(self):
-        game = self.game_window
-        if game.is_buffered(InputType.SPECIAL):
-            game.consume_buffer(InputType.SPECIAL)
-            print("Special Activated")
-            self.velocity[1] = 15
+    def draw(self, **kwargs):
+        super().draw(**kwargs)
+        self.special.draw()
